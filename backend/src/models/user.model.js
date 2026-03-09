@@ -18,6 +18,10 @@ const addressSchema = new mongoose.Schema({
         type: String,
         required: true, 
     },
+    state : {
+        type: String,
+        required: true,
+    },
     zipcode: {
         type: String,
         required: true,
@@ -30,7 +34,7 @@ const addressSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-})
+});
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -51,15 +55,20 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    stripecustomerId: {
+        type: String,
+        default: "",
+    },
     addresses: [addressSchema],
     wishList: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref:"Product "
-    }
+        ref: "Product ",
+    },
     ],
 
-}, { timestamps: true })
+}, 
+{ timestamps: true })
 
-const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema);
 
-export default User
+
