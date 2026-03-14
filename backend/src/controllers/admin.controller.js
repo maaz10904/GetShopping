@@ -1,6 +1,6 @@
 import { parse } from "dotenv";
 import cloudinary from "../config/cloudinary.js";
-import { Product } from "../models/Product.model.js";
+import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
 
@@ -62,7 +62,7 @@ export async function updateProduct(req, res) {
         }
         if (name) product.name = name;
         if (description) product.description = description;
-        if (price) product.price = parseFloat(price);
+        if (price !== undefined) product.price = parseFloat(price);
         if (stock !== undefined) product.stock = parseInt(stock);
         if (category) product.category = category;
 
@@ -102,13 +102,13 @@ export async function getAllOrders(_, res) {
 
 export async function updateOrderStatus(req, res) {
     try {
-        const { orderId } = req.params;
+        const { id } = req.params;
         const { status } = req.body;
 
         if (!["Pending", "Shipped", "Delivered"].includes(status)) {
             return res.status(400).json({ message: "Invalid status value" });
         }
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(id);
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
         }
