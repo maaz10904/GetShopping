@@ -125,7 +125,7 @@ export async function removeFromWishlist(req, res) {
 }
 export async function getWishlist(req, res) {
         try {
-            const user = req.user;
+            const user = await User.findById(req.user._id).populate("wishlist");
             res.status(200).json({wishlist: user.wishlist});
         }catch (error) {
             console.error("Error fetching wishlist:", error);
