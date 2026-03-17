@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
         default: "",
     },
     addresses: [addressSchema],
-    wishList: [{
+    wishlist: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product ",
     },

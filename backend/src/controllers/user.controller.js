@@ -1,3 +1,4 @@
+import e from "express";
 import { User } from "../models/user.model.js";
 
 export async function addAddress(req, res) {
@@ -5,6 +6,10 @@ export async function addAddress(req, res) {
        const {label,fullName, streetAddress, city, state, zipCode, phoneNumber, isDefault }=
         req.body;
         const user = req.user;
+
+        if(!fullName || !streetAddress || !city || !state || !zipCode){
+            return res.status(400).json({message:"All fields are required"});
+        }
 
     if(isDefault){
         user.addresses.forEach((addr) => {
@@ -100,24 +105,28 @@ export async function addToWishlist(req, res) {
 }
 }
 
-export async function getWishlist(req, res) {
+export async function removeFromWishlist(req, res) {
         try {
-            const {productId} = req.body;
+            const {productId} = req.params;
             const user = req.user;
 
             if(!user.wishlist.includes(productId)){
                 return res.status(400).json({message:"Product not in wishlist"});
             }
-            res.status(200).json({wishlist: user.wishlist});
+
+            user.wishlist.pull(productId);
+            await user.save();
+            res.status(200).json({message:"Product removed from wishlist", wishlist: user.wishlist});
+
         }catch (error) {
             console.error("Error fetching wishlist:", error);
         res.status(500).json({message:"something went wrong"});
     }
 }
-
-export async function removeFromWishlist(req, res) {
+export async function getWishlist(req, res) {
         try {
-            res.status(200).json({wishlist: req.user.wishlist});
+            const user = req.user;
+            res.status(200).json({wishlist: user.wishlist});
         }catch (error) {
             console.error("Error fetching wishlist:", error);
         res.status(500).json({message:"something went wrong"});
