@@ -3,11 +3,12 @@ import { User } from "../models/user.model.js";
 
 export async function addAddress(req, res) {
     try {
-       const {label,fullName, streetAddress, city, state, zipCode, phoneNumber, isDefault }=
+       const { label, fullName, streetAddress, city, state, zipcode, zipCode, phoneNumber, isDefault } =
         req.body;
+        const normalizedZipcode = zipcode ?? zipCode;
         const user = req.user;
-
-        if(!fullName || !streetAddress || !city || !state || !zipCode){
+ 
+        if (!label || !fullName || !streetAddress || !city || !state || !normalizedZipcode || !phoneNumber) {
             return res.status(400).json({message:"All fields are required"});
         }
 
@@ -23,7 +24,7 @@ export async function addAddress(req, res) {
         streetAddress,
         city,
         state,
-        zipCode,
+        zipcode: normalizedZipcode,
         phoneNumber,
         isDefault: isDefault || false
     });
@@ -48,8 +49,9 @@ export async function getAddresses(req, res) {
 
 export async function updateAddress(req, res) {
     try {
-        const {label,fullName, streetAddress, city, state, zipCode, phoneNumber, isDefault } =
+        const { label, fullName, streetAddress, city, state, zipcode, zipCode, phoneNumber, isDefault } =
          req.body;
+        const normalizedZipcode = zipcode ?? zipCode;
         const {addressId} = req.params;
 
         const user = req.user;
@@ -59,14 +61,18 @@ export async function updateAddress(req, res) {
             return res.status(404).json({message:"Address not found"});
         }
 
+        if (!label || !fullName || !streetAddress || !city || !state || !normalizedZipcode || !phoneNumber) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
         // Update the address fields
-        address.label = label || address.label;
-        address.fullName = fullName || address.fullName;
-        address.streetAddress = streetAddress || address.streetAddress;
-        address.city = city || address.city;
-        address.state = state || address.state;
-        address.zipCode = zipCode || address.zipCode;
-        address.phoneNumber = phoneNumber || address.phoneNumber;
+        address.label = label;
+        address.fullName = fullName;
+        address.streetAddress = streetAddress;
+        address.city = city;
+        address.state = state;
+        address.zipcode = normalizedZipcode;
+        address.phoneNumber = phoneNumber;
         address.isDefault = isDefault !== undefined ? isDefault : address.isDefault;
 
         await user.save();
