@@ -21,6 +21,7 @@ export async function createOrder(req, res) {
         }
          const order = await Order.create({
         user: user._id,
+        clerkId: user.clerkId,
         orderItems,
         shippingAddress,
         paymentResult,
@@ -43,6 +44,10 @@ export async function getUserOrders(req, res) {
         const orders = await Order.find({clerkId: req.user._id })
         .populate("orderItems.product", "name price")
         .sort({ createdAt: -1 });
+
+        const orderIds = orders.map(order => order._id);
+        const reviews = await Review.find({ order: { $in: orderIds } });
+        const reviewedOrderIds = new Set(reviews.map(review => review.order.toString()));
 
         const ordersWithReviewStatus = await Promise.all(
       orders.map(async (order) => {
