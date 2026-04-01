@@ -20,10 +20,12 @@ function ProductsPage() {
   const queryClient = useQueryClient();
 
   // fetch some data
-  const { data: products = [] } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["products"],
     queryFn: productApi.getAll,
   });
+
+  const products = Array.isArray(data) ? data : data?.products || [];
 
   // creating, update, deleting
   const createProductMutation = useMutation({
@@ -131,8 +133,21 @@ function ProductsPage() {
       </div>
 
       {/* PRODUCTS GRID */}
+      {isError ? (
+        <div className="alert alert-error">
+          <span>{error?.response?.data?.message || error?.message || "Failed to load products"}</span>
+        </div>
+      ) : isLoading ? (
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <div className="flex justify-center py-12">
+              <span className="loading loading-spinner loading-lg" />
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 gap-4">
-        {products?.map((product) => {
+        {products.map((product) => {
           const status = getStockStatusBadge(product.stock);
 
           return (
@@ -189,6 +204,7 @@ function ProductsPage() {
           );
         })}
       </div>
+      )}
 
       {/* ADD/EDIT PRODUCT MODAL */}
 
