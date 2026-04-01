@@ -5,7 +5,7 @@ import { useAuth } from '@clerk/react';
 import DashboardPage from "./pages/DashboardPage.jsx"
 import ProductsPage from "./pages/ProductsPage.jsx"
 import OrdersPage from "./pages/OrdersPage.jsx"
-import CustomersPage from "./pages/CostumersPage.jsx"
+import CustomersPage from "./pages/CustomersPage.jsx"
 import DashboardLayout from './Layouts/DashboardLayout.jsx';
 import PageLoader from './components/PageLoader.jsx';
 import { setAuthTokenGetter } from './libs/axios.js';
