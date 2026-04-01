@@ -5,13 +5,13 @@ dotenv.config()
 export const ENV = {
         NODE_ENV:process.env.NODE_ENV,
         PORT:process.env.PORT,
-        DB_URL:process.env.DB_URL,
+        DB_URL:process.env.DB_URL?.trim(),
         CLERK_PUBLISHABLE_KEY:process.env.CLERK_PUBLISHABLE_KEY,
         CLERK_SECRET_KEY:process.env.CLERK_SECRET_KEY,
         CLOUDINARY_API_KEY:process.env.CLOUDINARY_API_KEY,
         CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET,
         CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
-        INGEST_SIGNING_KEY:process.env.INGEST_SIGNING_KEY,
+        INNGEST_SIGNING_KEY:process.env.INNGEST_SIGNING_KEY,
         CLIENT_URL:process.env.CLIENT_URL,
         ADMIN_EMAIL:process.env.ADMIN_EMAIL
 };

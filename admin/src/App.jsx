@@ -1,18 +1,34 @@
 import { Navigate, Route, Routes } from 'react-router';
+import { useLayoutEffect } from 'react';
 import LoginPage from "./pages/LoginPage.jsx";
 import { useAuth } from '@clerk/react';
 import DashboardPage from "./pages/DashboardPage.jsx"
 import ProductsPage from "./pages/ProductsPage.jsx"
 import OrdersPage from "./pages/OrdersPage.jsx"
-import CustomersPage from "./pages/CostumersPage.jsx"
+import CustomersPage from "./pages/CustomersPage.jsx"
 import DashboardLayout from './Layouts/DashboardLayout.jsx';
-import {LoaderIcon} from "lucide-react"
 import PageLoader from './components/PageLoader.jsx';
+import { setAuthTokenGetter } from './libs/axios.js';
 
 
 function App(){
 
-  const {isSignedIn,isLoaded} = useAuth()
+  const {isSignedIn,isLoaded,getToken} = useAuth()
+
+  useLayoutEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
+    setAuthTokenGetter(async () => {
+      if (!isSignedIn) return null;
+      return getToken();
+    });
+
+    return () => {
+      setAuthTokenGetter(null);
+    };
+  }, [getToken, isLoaded, isSignedIn]);
 
   if(!isLoaded) return (
     <PageLoader/>

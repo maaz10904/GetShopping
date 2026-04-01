@@ -1,4 +1,3 @@
-import { parse } from "dotenv";
 import cloudinary from "../config/cloudinary.js";
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
@@ -83,6 +82,22 @@ export async function updateProduct(req, res) {
         res.status(200).json(product);
     } catch (error) {
         console.error("Error updating product:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function deleteProduct(req, res) {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting product:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
