@@ -68,7 +68,7 @@ function DashboardPage() {
           </div>
         ))}
       </div>
-
+  
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title">Recent Orders</h2>
