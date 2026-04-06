@@ -57,6 +57,7 @@ function DashboardPage() {
           <span>{dashboardError}</span>
         </div>
       ) : null}
+      
 
       <div className="stats stats-vertical lg:stats-horizontal shadow w-full bg-base-100">
         {statsCards.map((stat) => (
