@@ -2,6 +2,23 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
+const parseAdminEmails = () => {
+        const adminEmailsRaw = process.env.ADMIN_EMAILS;
+
+        if (adminEmailsRaw) {
+                return adminEmailsRaw
+                        .split(",")
+                        .map((email) => email.trim().toLowerCase())
+                        .filter(Boolean);
+        }
+
+        if (process.env.ADMIN_EMAIL) {
+                return [process.env.ADMIN_EMAIL.trim().toLowerCase()];
+        }
+
+        return [];
+};
+
 export const ENV = {
         NODE_ENV:process.env.NODE_ENV,
         PORT:process.env.PORT,
@@ -13,5 +30,6 @@ export const ENV = {
         CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
         INNGEST_SIGNING_KEY:process.env.INNGEST_SIGNING_KEY,
         CLIENT_URL:process.env.CLIENT_URL,
-        ADMIN_EMAIL:process.env.ADMIN_EMAIL
+        ADMIN_EMAIL:process.env.ADMIN_EMAIL,
+        ADMIN_EMAILS:parseAdminEmails()
 };
