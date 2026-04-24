@@ -23,6 +23,10 @@
   },
   "homepage": "https://github.com/maaz10904/GetShopping#readme",
   "dependencies": {
-    "mongodb": "^7.1.0"
+    "mongodb": "^7.1.0",
+    "sentry-expo": "^7.2.0",
+    "expo": "~55.0.17",
+    "react": "19.2.0",
+    "react-native": "0.83.6"
   }
 }
