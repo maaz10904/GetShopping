@@ -1,6 +1,6 @@
 import AddressCard from "@/components/AddressCard";
 import AddressesHeader from "@/components/AddressesHeader";
-import AddressFormModal from "@/components/AddressFormModal";
+import AddressFormModal from "@/components/AddressFormModel";
 import SafeScreen from "@/components/SafeScreen";
 import { useAddresses } from "@/hooks/useAddressess";
 import { Address } from "@/types";

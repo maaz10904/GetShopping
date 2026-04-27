@@ -1,4 +1,4 @@
-import RatingModal from "@/components/RatingModal";
+import RatingModal from "@/components/RatingModel";
 import SafeScreen from "@/components/SafeScreen";
 import { useOrders } from "@/hooks/useOrders";
 import { useReviews } from "@/hooks/useReviews";
@@ -151,7 +151,7 @@ function OrdersScreen() {
                     {order.status === "delivered" &&
                       (order.hasReviewed ? (
                         <View className="bg-primary/20 px-5 py-3 rounded-full flex-row items-center">
-                          <Ionicons name="checkmark-circle" size={18} color="#1DB954" />
+                          <Ionicons name="checkmark-circle" size={18} color="#DB924B" />
                           <Text className="text-primary font-bold text-sm ml-2">Reviewed</Text>
                         </View>
                       ) : (
