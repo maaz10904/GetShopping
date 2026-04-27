@@ -27,9 +27,18 @@ export const formatDate = (dateString) => {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "";
 
-  return new Date(dateString).toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+};
+
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(amount || 0));
 };

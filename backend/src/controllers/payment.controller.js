@@ -57,8 +57,8 @@ export async function createPaymentIntent(req, res) {
       });
     }
 
-    const shipping = 10.0; // $10
-    const tax = subtotal * 0.08; // 8%
+    const shipping = 99; // INR
+    const tax = subtotal * 0.18; // GST
     const total = subtotal + shipping + tax;
 
     if (total <= 0) {
@@ -87,8 +87,8 @@ export async function createPaymentIntent(req, res) {
 
     // create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(total * 100), // convert to cents
-      currency: "usd",
+      amount: Math.round(total * 100), // convert to paise
+      currency: "inr",
       customer: customer.id,
       automatic_payment_methods: {
         enabled: true,

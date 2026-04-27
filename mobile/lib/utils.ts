@@ -4,7 +4,16 @@ export const capitalizeFirstLetter = (text: string) => {
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" });
+};
+
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 };
 
 export const getStatusColor = (status: string) => {

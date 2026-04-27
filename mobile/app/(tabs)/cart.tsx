@@ -2,6 +2,7 @@ import SafeScreen from "@/components/SafeScreen";
 import { useAddresses } from "@/hooks/useAddressess";
 import useCart from "@/hooks/useCart";
 import { useApi } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
 import axios from "axios";
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useStripe } from "@stripe/stripe-react-native";
@@ -37,8 +38,8 @@ const CartScreen = () => {
 
   const cartItems = cart?.items || [];
   const subtotal = cartTotal;
-  const shipping = 10.0; // $10 shipping fee
-  const tax = subtotal * 0.08; // 8% tax
+  const shipping = 99; // INR shipping fee
+  const tax = subtotal * 0.18; // GST
   const total = subtotal + shipping + tax;
 
   const handleQuantityChange = (productId: string, currentQuantity: number, change: number) => {
@@ -211,10 +212,10 @@ const CartScreen = () => {
                     </Text>
                     <View className="flex-row items-center mt-2">
                       <Text className="text-primary font-bold text-2xl">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        {formatCurrency(item.product.price * item.quantity)}
                       </Text>
                       <Text className="text-text-secondary text-sm ml-2">
-                        ${item.product.price.toFixed(2)} each
+                        {formatCurrency(item.product.price)} each
                       </Text>
                     </View>
                   </View>
@@ -281,7 +282,7 @@ const CartScreen = () => {
             </Text>
           </View>
           <View className="flex-row items-center">
-            <Text className="text-text-primary font-bold text-xl">${total.toFixed(2)}</Text>
+            <Text className="text-text-primary font-bold text-xl">{formatCurrency(total)}</Text>
           </View>
         </View>
 

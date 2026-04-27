@@ -7,7 +7,7 @@ const products = [
     name: "Wireless Bluetooth Headphones",
     description:
       "Premium over-ear headphones with active noise cancellation, 30-hour battery life, and premium sound quality. Perfect for music lovers and travelers.",
-    price: 149.99,
+    price: 12499,
     stock: 50,
     category: "Electronics",
     images: [
@@ -21,7 +21,7 @@ const products = [
     name: "Smart Watch Series 5",
     description:
       "Advanced fitness tracking, heart rate monitor, GPS, and water-resistant design. Stay connected with notifications and apps on your wrist.",
-    price: 299.99,
+    price: 24999,
     stock: 35,
     category: "Electronics",
     images: [
@@ -35,7 +35,7 @@ const products = [
     name: "Leather Crossbody Bag",
     description:
       "Handcrafted genuine leather bag with adjustable strap. Features multiple compartments and elegant design perfect for daily use.",
-    price: 89.99,
+    price: 7499,
     stock: 25,
     category: "Fashion",
     images: [
@@ -49,7 +49,7 @@ const products = [
     name: "Running Shoes - Pro Edition",
     description:
       "Lightweight running shoes with responsive cushioning and breathable mesh upper. Designed for performance and comfort during long runs.",
-    price: 129.99,
+    price: 10999,
     stock: 60,
     category: "Sports",
     images: [
@@ -63,7 +63,7 @@ const products = [
     name: "Bestselling Mystery Novel",
     description:
       "A gripping psychological thriller that will keep you on the edge of your seat. New York Times bestseller with over 1 million copies sold.",
-    price: 24.99,
+    price: 499,
     stock: 100,
     category: "Books",
     images: [
@@ -77,7 +77,7 @@ const products = [
     name: "Portable Bluetooth Speaker",
     description:
       "Waterproof wireless speaker with 360-degree sound, 12-hour battery life, and durable design. Perfect for outdoor adventures.",
-    price: 79.99,
+    price: 3499,
     stock: 45,
     category: "Electronics",
     images: [
@@ -91,7 +91,7 @@ const products = [
     name: "Classic Denim Jacket",
     description:
       "Timeless denim jacket with vintage wash and comfortable fit. A wardrobe essential that pairs perfectly with any outfit.",
-    price: 69.99,
+    price: 2499,
     stock: 40,
     category: "Fashion",
     images: [
@@ -105,7 +105,7 @@ const products = [
     name: "Yoga Mat Pro",
     description:
       "Extra-thick non-slip yoga mat with carrying strap. Eco-friendly material provides excellent cushioning and grip for all yoga styles.",
-    price: 49.99,
+    price: 1299,
     stock: 75,
     category: "Sports",
     images: [
@@ -119,7 +119,7 @@ const products = [
     name: "Mechanical Keyboard RGB",
     description:
       "Gaming keyboard with customizable RGB lighting, mechanical switches, and programmable keys. Built for gamers and typing enthusiasts.",
-    price: 119.99,
+    price: 8999,
     stock: 30,
     category: "Electronics",
     images: [
@@ -133,7 +133,7 @@ const products = [
     name: "Coffee Table Book Collection",
     description:
       "Stunning photography book featuring architecture and design from around the world. Hardcover edition with 300+ pages of inspiration.",
-    price: 39.99,
+    price: 1499,
     stock: 55,
     category: "Books",
     images: [
