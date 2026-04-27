@@ -49,6 +49,13 @@
           "project": "getshopping-app",
           "organization": "student-fcd"
         }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "",
+          "enableGooglePay": false
+        }
       ]
     ],
     "experiments": {

@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import "../global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider } from "@clerk/expo";
+import { StripeProvider } from "@stripe/stripe-react-native";
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
@@ -24,7 +25,8 @@ Sentry.init({
 });
 
 const queryClient = new QueryClient();
-const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const stripePublishableKey = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const tokenCache = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -39,16 +41,20 @@ const tokenCache = (() => {
 })();
 
 export default Sentry.wrap(function RootLayout() {
-  if (!publishableKey) {
+  if (!clerkPublishableKey) {
     throw new Error(
       "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Check mobile/.env and restart Expo."
     );
   }
 
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}><QueryClientProvider client={queryClient}>
-      <Stack screenOptions={{headerShown: false,}}/>
-    </QueryClientProvider></ClerkProvider>
+    <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
+      <StripeProvider publishableKey={stripePublishableKey ?? ""}>
+        <QueryClientProvider client={queryClient}>
+          <Stack screenOptions={{headerShown: false,}}/>
+        </QueryClientProvider>
+      </StripeProvider>
+    </ClerkProvider>
     
   );
 });
