@@ -31,5 +31,8 @@ export const ENV = {
         INNGEST_SIGNING_KEY:process.env.INNGEST_SIGNING_KEY,
         CLIENT_URL:process.env.CLIENT_URL,
         ADMIN_EMAIL:process.env.ADMIN_EMAIL,
-        ADMIN_EMAILS:parseAdminEmails()
+        ADMIN_EMAILS:parseAdminEmails(),
+        STRIPE_PUBLISHABLE_KEY:process.env.STRIPE_PUBLISHABLE_KEY,
+        STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET:process.env.STRIPE_WEBHOOK_SECRET
 };

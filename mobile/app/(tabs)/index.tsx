@@ -5,8 +5,8 @@ import { Product } from "@/types";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, Button } from "react-native";
-import * as Sentry from "@sentry/react-native";
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Image } from "react-native";
+
 
 const CATEGORIES: (
   | { name: string; icon: keyof typeof Ionicons.glyphMap; image?: never }

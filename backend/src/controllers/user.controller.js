@@ -1,6 +1,18 @@
 import e from "express";
 import { User } from "../models/user.model.js";
 
+function normalizeAddress(address) {
+    const plainAddress = address.toObject ? address.toObject() : address;
+    return {
+        ...plainAddress,
+        zipCode: plainAddress.zipCode ?? plainAddress.zipcode,
+    };
+}
+
+function normalizeAddresses(addresses) {
+    return addresses.map(normalizeAddress);
+}
+
 export async function addAddress(req, res) {
     try {
        const { label, fullName, streetAddress, city, state, zipcode, zipCode, phoneNumber, isDefault } =
@@ -31,7 +43,7 @@ export async function addAddress(req, res) {
 
     await user.save();
 
-    res.status(201).json({message:"Address added successfully", addresses: user.addresses});
+    res.status(201).json({message:"Address added successfully", addresses: normalizeAddresses(user.addresses)});
 
 
 }catch (error) {
@@ -41,7 +53,7 @@ export async function addAddress(req, res) {
 export async function getAddresses(req, res) {
     try {
         const user = req.user;
-        res.status(200).json({addresses: user.addresses});
+        res.status(200).json({addresses: normalizeAddresses(user.addresses)});
     }catch (error) {
         res.status(500).json({message:"something went wrong"});
     }
@@ -76,7 +88,7 @@ export async function updateAddress(req, res) {
         address.isDefault = isDefault !== undefined ? isDefault : address.isDefault;
 
         await user.save();
-        res.status(200).json({message:"Address updated successfully", addresses: user.addresses});
+        res.status(200).json({message:"Address updated successfully", addresses: normalizeAddresses(user.addresses)});
 
     }catch (error) {
         res.status(500).json({message:"something went wrong"});
@@ -89,7 +101,7 @@ export async function deleteAddress(req, res) {
         const user = req.user;
         user.addresses.pull(addressId);
         await user.save();
-        res.status(200).json({message:"Address deleted successfully", addresses: user.addresses});
+        res.status(200).json({message:"Address deleted successfully", addresses: normalizeAddresses(user.addresses)});
         }catch (error) {
         res.status(500).json({message:"something went wrong"});
     }
