@@ -3,7 +3,10 @@ import { ENV } from "../config/env.js";
 import { User } from "../models/user.model.js";
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
-import { Cart } from "../models/cart.model.js";
+
+const SHIPPING_FEE = 100;
+const TAX_RATE = 0.18;
+const STRIPE_CURRENCY = "inr";
 
 export async function createPaymentIntent(req, res) {
   try {
@@ -57,8 +60,8 @@ export async function createPaymentIntent(req, res) {
       });
     }
 
-    const shipping = 10.0; // $10
-    const tax = subtotal * 0.08; // 8%
+    const shipping = SHIPPING_FEE;
+    const tax = subtotal * TAX_RATE;
     const total = subtotal + shipping + tax;
 
     if (total <= 0) {
@@ -87,8 +90,8 @@ export async function createPaymentIntent(req, res) {
 
     // create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(total * 100), // convert to cents
-      currency: "usd",
+      amount: Math.round(total * 100), // Stripe expects INR in paise
+      currency: STRIPE_CURRENCY,
       customer: customer.id,
       automatic_payment_methods: {
         enabled: true,
@@ -99,11 +102,16 @@ export async function createPaymentIntent(req, res) {
         orderItems: JSON.stringify(validatedItems),
         shippingAddress: JSON.stringify(shippingAddress),
         totalPrice: total.toFixed(2),
+        currency: STRIPE_CURRENCY,
       },
       // in the webhooks section we will use this metadata
     });
 
-    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+      totalPrice: total.toFixed(2),
+      currency: STRIPE_CURRENCY,
+    });
   } catch (error) {
     console.error("Error creating payment intent:", error);
     res.status(500).json({ error: "Failed to create payment intent" });
@@ -150,6 +158,7 @@ export async function handleWebhook(req, res) {
         paymentResult: {
           id: paymentIntent.id,
           status: "succeeded",
+          currency: paymentIntent.currency,
         },
         totalPrice: parseFloat(totalPrice),
       });

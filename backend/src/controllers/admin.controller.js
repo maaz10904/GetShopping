@@ -108,7 +108,7 @@ export async function getAllOrders(_, res) {
         .populate("user", "name email")
         .populate("orderItems.product")
         .sort({ createdAt: -1 });
-        res.status(200).json(orders);
+        res.status(200).json({ orders });
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -120,7 +120,7 @@ export async function updateOrderStatus(req, res) {
         const { id } = req.params;
         const { status } = req.body;
 
-        if (!["Pending", "Shipped", "Delivered"].includes(status)) {
+        if (!["pending", "shipped", "delivered"].includes(status)) {
             return res.status(400).json({ message: "Invalid status value" });
         }
         const order = await Order.findById(id);
@@ -129,10 +129,10 @@ export async function updateOrderStatus(req, res) {
         }
         order.status = status;
 
-        if (status === "Shipped") {
+        if (status === "shipped") {
             order.shippedAt = new Date();
         }
-        if (status === "Delivered") {
+        if (status === "delivered") {
             order.deliverAt = new Date();
         }
         await order.save();

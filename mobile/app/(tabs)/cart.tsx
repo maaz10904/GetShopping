@@ -2,7 +2,8 @@ import SafeScreen from "@/components/SafeScreen";
 import { useAddresses } from "@/hooks/useAddressess";
 import useCart from "@/hooks/useCart";
 import { useApi } from "@/lib/api";
-import axios from "axios";
+import { formatCurrency } from "@/lib/utils";
+import { isAxiosError } from "axios";
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useState } from "react";
@@ -37,8 +38,8 @@ const CartScreen = () => {
 
   const cartItems = cart?.items || [];
   const subtotal = cartTotal;
-  const shipping = 10.0; // $10 shipping fee
-  const tax = subtotal * 0.08; // 8% tax
+  const shipping = 100;
+  const tax = subtotal * 0.18;
   const total = subtotal + shipping + tax;
 
   const handleQuantityChange = (productId: string, currentQuantity: number, change: number) => {
@@ -142,6 +143,26 @@ const CartScreen = () => {
 
         Alert.alert("Payment cancelled", presentError.message);
       } else {
+        const paymentIntentId = data.clientSecret?.split("_secret_")[0];
+
+        await api.post("/orders", {
+          orderItems: cartItems,
+          shippingAddress: {
+            fullName: selectedAddress.fullName,
+            streetAddress: selectedAddress.streetAddress,
+            city: selectedAddress.city,
+            state: selectedAddress.state,
+            zipCode,
+            phoneNumber: selectedAddress.phoneNumber,
+          },
+          paymentResult: {
+            id: paymentIntentId,
+            status: "succeeded",
+            currency: "inr",
+          },
+          totalPrice: Number(data.totalPrice ?? total.toFixed(2)),
+        });
+
         Sentry.logger.info("Payment successful", {
           total: total.toFixed(2),
           itemCount: cartItems.length,
@@ -159,7 +180,7 @@ const CartScreen = () => {
         itemCount: cartItems.length,
       });
 
-      const message = axios.isAxiosError(error)
+      const message = isAxiosError(error)
         ? error.response?.data?.error || error.response?.data?.message || error.message
         : error instanceof Error
           ? error.message
@@ -211,10 +232,10 @@ const CartScreen = () => {
                     </Text>
                     <View className="flex-row items-center mt-2">
                       <Text className="text-primary font-bold text-2xl">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        {formatCurrency(item.product.price * item.quantity)}
                       </Text>
                       <Text className="text-text-secondary text-sm ml-2">
-                        ${item.product.price.toFixed(2)} each
+                        {formatCurrency(item.product.price)} each
                       </Text>
                     </View>
                   </View>
@@ -281,7 +302,7 @@ const CartScreen = () => {
             </Text>
           </View>
           <View className="flex-row items-center">
-            <Text className="text-text-primary font-bold text-xl">${total.toFixed(2)}</Text>
+            <Text className="text-text-primary font-bold text-xl">{formatCurrency(total)}</Text>
           </View>
         </View>
 
