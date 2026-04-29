@@ -5,6 +5,7 @@ import { serve } from "inngest/express";
 import cors from "cors";
 
 import { functions, inngest } from "./config/inngest.js";
+import { handleWebhook } from "./controllers/payment.controller.js";
 
 import { ENV } from "./config/env.js"
 import { connectDB } from "./config/db.js";
@@ -21,6 +22,7 @@ const app = express();
 
 const __dirname = path.resolve();
 
+app.post("/api/payments/webhook", express.raw({ type: "application/json" }), handleWebhook);
 app.use(express.json());
 app.use(clerkMiddleware());
 app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));

@@ -1,5 +1,5 @@
 import { orderApi } from "../libs/api";
-import { formatDate } from "../libs/utils";
+import { formatCurrency, formatDate } from "../libs/utils";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -88,7 +88,7 @@ function OrdersPage() {
                         </td>
 
                         <td>
-                          <span className="font-semibold">${order.totalPrice.toFixed(2)}</span>
+                          <span className="font-semibold">{formatCurrency(order.totalPrice)}</span>
                         </td>
 
                         <td>

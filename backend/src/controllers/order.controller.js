@@ -10,28 +10,46 @@ export async function createOrder(req, res) {
             return res.status(400).json({ message: "No order items" });
         }
 
+        if (paymentResult?.id) {
+            const existingOrder = await Order.findOne({ "paymentResult.id": paymentResult.id });
+            if (existingOrder) {
+                return res.status(200).json({ message: "Order already exists", order: existingOrder });
+            }
+        }
+
+        const validatedItems = [];
+
         for (const item of orderItems) {
-            const product = await Product.findById(item.product._id);
+            const productId = item.product?._id ?? item.product;
+            const product = await Product.findById(productId);
             if (!product) {
                 return res.status(404).json({ message: "Product not found" });
             }
             if (product.stock < item.quantity) {
             return res.status(400).json({ message: `Not enough stock for product ${product.name}` });
         }
+            validatedItems.push({
+                product: product._id,
+                name: product.name,
+                price: product.price,
+                quantity: item.quantity,
+                image: product.images[0],
+            });
         }
          const order = await Order.create({
         user: user._id,
         clerkId: user.clerkId,
-        orderItems,
+        orderItems: validatedItems,
         shippingAddress,
         paymentResult,
         totalPrice
         });
-            for (const item of orderItems) {
-                await Product.findByIdAndUpdate(item.product._id, {
+            for (const item of validatedItems) {
+                await Product.findByIdAndUpdate(item.product, {
                      $inc: { stock: -item.quantity } 
                     });
             }
+            await order.populate("orderItems.product");
             res.status(201).json({ message: "Order created successfully", order });
     } 
     catch (error) {
@@ -41,7 +59,7 @@ export async function createOrder(req, res) {
 }
 export async function getUserOrders(req, res) {
     try {
-        const orders = await Order.find({clerkId: req.user._id })
+        const orders = await Order.find({clerkId: req.user.clerkId })
         .populate("orderItems.product", "name price")
         .sort({ createdAt: -1 });
 

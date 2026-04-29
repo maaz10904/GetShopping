@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DollarSignIcon, PackageIcon, ShoppingBagIcon, UsersIcon } from "lucide-react";
 
 import { orderApi, statsApi } from "../libs/api";
-import { capitalizeText, formatDate, getOrderStatusBadge } from "../libs/utils";
+import { capitalizeText, formatCurrency, formatDate, getOrderStatusBadge } from "../libs/utils";
 
 function DashboardPage() {
   const { data: ordersData, isLoading: ordersLoading, error: ordersError } = useQuery({
@@ -24,7 +24,7 @@ function DashboardPage() {
         ? "..."
         : statsError
           ? "Error"
-          : `Rs ${Number(statsData?.totalRevenue || 0).toFixed(2)}`,
+          : formatCurrency(statsData?.totalRevenue),
       icon: <DollarSignIcon className="size-8" />,
     },
     {
@@ -115,7 +115,7 @@ function DashboardPage() {
                       </td>
 
                       <td>
-                        <span className="font-semibold">${order.totalPrice.toFixed(2)}</span>
+                        <span className="font-semibold">{formatCurrency(order.totalPrice)}</span>
                       </td>
 
                       <td>

@@ -73,6 +73,7 @@ const orderSchema = new mongoose.Schema({
     paymentResult: {
         id: { type: String },
         status: { type: String },
+        currency: { type: String, default: 'inr' },
     },
     totalPrice: {
         type: Number,

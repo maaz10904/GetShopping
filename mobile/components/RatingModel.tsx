@@ -1,5 +1,6 @@
 import { Order } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { formatCurrency } from "@/lib/utils";
 import { Image } from "expo-image";
 import {
   View,
@@ -74,7 +75,7 @@ const RatingModal = ({
                             {item.name}
                           </Text>
                           <Text className="text-text-secondary text-xs mt-1">
-                            Qty: {item.quantity} • ${item.price.toFixed(2)}
+                            Qty: {item.quantity} - {formatCurrency(item.price)}
                           </Text>
                         </View>
                       </View>
