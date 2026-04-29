@@ -53,7 +53,7 @@ const ShopScreen = () => {
         <View className="px-6 pb-4 pt-6">
           <View className='flex-row items-center justify-between mb-6'>
             <View>
-              <Text className='text-text-primary text-3xl font-bold tracking-tight'>Shop</Text>
+              <Text className='text-text-primary text-3xl font-bold tracking-tight'>GetShopping</Text>
               <Text className='text-text-secondary text-sm mt-1'>Browse all products</Text>
             </View>
             <TouchableOpacity className='bg-surface/50 p-3 rounded-full'>
