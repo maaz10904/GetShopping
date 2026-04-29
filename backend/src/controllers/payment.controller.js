@@ -8,6 +8,44 @@ const SHIPPING_FEE = 100;
 const TAX_RATE = 0.18;
 const STRIPE_CURRENCY = "inr";
 
+async function createOrderFromPaymentIntent(paymentIntent) {
+  const { userId, clerkId, orderItems, shippingAddress, totalPrice } = paymentIntent.metadata || {};
+
+  if (!userId || !clerkId || !orderItems || !shippingAddress || !totalPrice) {
+    throw new Error("Payment intent is missing order metadata");
+  }
+
+  const existingOrder = await Order.findOne({ "paymentResult.id": paymentIntent.id }).populate(
+    "orderItems.product"
+  );
+  if (existingOrder) {
+    return existingOrder;
+  }
+
+  const items = JSON.parse(orderItems);
+  const order = await Order.create({
+    user: userId,
+    clerkId,
+    orderItems: items,
+    shippingAddress: JSON.parse(shippingAddress),
+    paymentResult: {
+      id: paymentIntent.id,
+      status: paymentIntent.status,
+      currency: paymentIntent.currency,
+    },
+    totalPrice: parseFloat(totalPrice),
+  });
+
+  for (const item of items) {
+    await Product.findByIdAndUpdate(item.product, {
+      $inc: { stock: -item.quantity },
+    });
+  }
+
+  await order.populate("orderItems.product");
+  return order;
+}
+
 export async function createPaymentIntent(req, res) {
   try {
     const { cartItems, shippingAddress } = req.body;
@@ -118,6 +156,38 @@ export async function createPaymentIntent(req, res) {
   }
 }
 
+export async function confirmPaymentOrder(req, res) {
+  try {
+    const { paymentIntentId } = req.body;
+    const user = req.user;
+
+    if (!paymentIntentId) {
+      return res.status(400).json({ error: "Payment intent ID is required" });
+    }
+
+    if (!ENV.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: "Stripe secret key is not configured on the server" });
+    }
+
+    const stripe = new Stripe(ENV.STRIPE_SECRET_KEY);
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ error: "Payment has not completed yet" });
+    }
+
+    if (paymentIntent.metadata?.clerkId !== user.clerkId) {
+      return res.status(403).json({ error: "Payment does not belong to this user" });
+    }
+
+    const order = await createOrderFromPaymentIntent(paymentIntent);
+    res.status(200).json({ message: "Order confirmed successfully", order });
+  } catch (error) {
+    console.error("Error confirming payment order:", error);
+    res.status(500).json({ error: error.message || "Failed to confirm order" });
+  }
+}
+
 export async function handleWebhook(req, res) {
   if (!ENV.STRIPE_SECRET_KEY || !ENV.STRIPE_WEBHOOK_SECRET) {
     return res.status(500).json({ error: "Stripe webhook secrets are not configured on the server" });
@@ -140,37 +210,7 @@ export async function handleWebhook(req, res) {
     console.log("Payment succeeded:", paymentIntent.id);
 
     try {
-      const { userId, clerkId, orderItems, shippingAddress, totalPrice } = paymentIntent.metadata;
-
-      // Check if order already exists (prevent duplicates)
-      const existingOrder = await Order.findOne({ "paymentResult.id": paymentIntent.id });
-      if (existingOrder) {
-        console.log("Order already exists for payment:", paymentIntent.id);
-        return res.json({ received: true });
-      }
-
-      // create order
-      const order = await Order.create({
-        user: userId,
-        clerkId,
-        orderItems: JSON.parse(orderItems),
-        shippingAddress: JSON.parse(shippingAddress),
-        paymentResult: {
-          id: paymentIntent.id,
-          status: "succeeded",
-          currency: paymentIntent.currency,
-        },
-        totalPrice: parseFloat(totalPrice),
-      });
-
-      // update product stock
-      const items = JSON.parse(orderItems);
-      for (const item of items) {
-        await Product.findByIdAndUpdate(item.product, {
-          $inc: { stock: -item.quantity },
-        });
-      }
-
+      const order = await createOrderFromPaymentIntent(paymentIntent);
       console.log("Order created successfully:", order._id);
     } catch (error) {
       console.error("Error creating order from webhook:", error);
