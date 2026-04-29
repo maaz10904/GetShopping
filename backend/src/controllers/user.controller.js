@@ -1,4 +1,3 @@
-import e from "express";
 import { User } from "../models/user.model.js";
 
 function normalizeAddress(address) {
@@ -56,6 +55,33 @@ export async function getAddresses(req, res) {
         res.status(200).json({addresses: normalizeAddresses(user.addresses)});
     }catch (error) {
         res.status(500).json({message:"something went wrong"});
+    }
+}
+
+export async function updateProfile(req, res) {
+    try {
+        const { firstName, lastName, imageUrl } = req.body;
+        const normalizedFirstName = firstName?.trim();
+        const normalizedLastName = lastName?.trim();
+
+        if (!normalizedFirstName) {
+            return res.status(400).json({ message: "First name is required" });
+        }
+
+        const name = [normalizedFirstName, normalizedLastName].filter(Boolean).join(" ");
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                name,
+                imageUrl: imageUrl ?? req.user.imageUrl,
+            },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Profile updated successfully", user });
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        res.status(500).json({ message: "something went wrong" });
     }
 }
 
