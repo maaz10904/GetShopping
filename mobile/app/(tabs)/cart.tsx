@@ -145,23 +145,7 @@ const CartScreen = () => {
       } else {
         const paymentIntentId = data.clientSecret?.split("_secret_")[0];
 
-        await api.post("/orders", {
-          orderItems: cartItems,
-          shippingAddress: {
-            fullName: selectedAddress.fullName,
-            streetAddress: selectedAddress.streetAddress,
-            city: selectedAddress.city,
-            state: selectedAddress.state,
-            zipCode,
-            phoneNumber: selectedAddress.phoneNumber,
-          },
-          paymentResult: {
-            id: paymentIntentId,
-            status: "succeeded",
-            currency: "inr",
-          },
-          totalPrice: Number(data.totalPrice ?? total.toFixed(2)),
-        });
+        await api.post("/payments/confirm-order", { paymentIntentId });
 
         Sentry.logger.info("Payment successful", {
           total: total.toFixed(2),
