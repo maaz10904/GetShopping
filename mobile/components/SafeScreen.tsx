@@ -1,7 +1,8 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { PropsWithChildren } from "react";
 
-const SafeScreen = ({ children }: { children: React.ReactNode }) => {
+const SafeScreen = ({ children }: PropsWithChildren) => {
   const insets = useSafeAreaInsets();
 
   return (
