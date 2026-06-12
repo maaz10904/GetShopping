@@ -7,6 +7,7 @@ import cors from "cors";
 import { functions, inngest } from "./config/inngest.js";
 import { handleWebhook } from "./controllers/payment.controller.js";
 
+import mongoose from "mongoose";
 import { ENV } from "./config/env.js"
 import { connectDB } from "./config/db.js";
 
@@ -49,8 +50,22 @@ if(ENV.NODE_ENV==="production"){
         res.sendFile(path.join(__dirname,"../admin","dist","index.html"))
     })
 }
+async function cleanLegacyOrderIndexes() {
+    try {
+        const collection = mongoose.connection.collection('orders');
+        const indexes = await collection.indexes();
+        if (indexes.some(index => index.name === 'orderld_1')) {
+            console.warn('Dropping legacy orders.orderld_1 index to prevent duplicate-null order insertion errors');
+            await collection.dropIndex('orderld_1');
+        }
+    } catch (error) {
+        console.error('Failed to clean legacy order indexes:', error);
+    }
+}
+
 const startServer = async () => {
     await connectDB();
+    await cleanLegacyOrderIndexes();
     app.listen(ENV.PORT, ()=> {
         console.log('server is up and running');
     })
