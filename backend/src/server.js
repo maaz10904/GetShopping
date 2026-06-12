@@ -29,7 +29,14 @@ app.post("/api/payments/webhook", express.raw({ type: "application/json" }), han
 app.use(express.json());
 app.use(clerkMiddleware());
 app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+// Middleware to serve uploads with CORS headers
+app.use("/uploads", (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Cache-Control", "public, max-age=3600");
+    res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+    next();
+}, express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/inngest", serve({client: inngest, functions}));
 

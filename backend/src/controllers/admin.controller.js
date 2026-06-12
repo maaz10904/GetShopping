@@ -21,19 +21,26 @@ const saveBufferLocally = async (buffer, originalName) => {
     const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
     const filePath = path.join(LOCAL_UPLOAD_DIR, filename);
     await fs.promises.writeFile(filePath, buffer);
-    return { secure_url: `${ENV.BACKEND_URL}/uploads/products/${filename}` };
+    const baseUrl = ENV.BACKEND_URL?.endsWith('/') ? ENV.BACKEND_URL.slice(0, -1) : ENV.BACKEND_URL;
+    return { secure_url: `${baseUrl}/uploads/products/${filename}` };
 };
 
 const uploadBufferToCloudinary = async (file) => {
     try {
         return await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: "products", resource_type: "image" },
+                { 
+                    folder: "products", 
+                    resource_type: "image",
+                    secure: true 
+                },
                 (error, result) => {
                     if (error) {
                         reject(error);
                     } else {
-                        resolve(result);
+                        // Ensure HTTPS URL
+                        const secureUrl = result.secure_url || result.url;
+                        resolve({ secure_url: secureUrl });
                     }
                 }
             );

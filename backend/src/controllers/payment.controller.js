@@ -27,7 +27,7 @@ async function createOrderFromPaymentIntent(paymentIntent) {
   const order = await Order.create({
     user: userId,
     clerkId,
-    orderld: paymentIntent.id || crypto.randomUUID(),
+    orderId: paymentIntent.id,
     orderItems: items,
     shippingAddress: JSON.parse(shippingAddress),
     paymentResult: {
