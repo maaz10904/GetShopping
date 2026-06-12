@@ -64,6 +64,9 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    orderld: {
+        type: String,
+    },
     orderItems: [orderItemsSchema],
     shippingAddress: {
         type: shippingAddressSchema,
@@ -91,6 +94,8 @@ const orderSchema = new mongoose.Schema({
     shippedAt: {
         type: Date,
     },
-}, { timestamps: true });
+});
+
+orderSchema.index({ "paymentResult.id": 1 }, { unique: true, sparse: true });
 
 export const Order = mongoose.model('Order', orderSchema);

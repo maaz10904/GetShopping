@@ -1,5 +1,6 @@
 import express from "express";
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { clerkMiddleware } from '@clerk/express'
 import { serve } from "inngest/express";
 import cors from "cors";
@@ -21,12 +22,14 @@ import paymentRoutes from "./routes/payment.route.js"
 
 const app = express();
 
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.post("/api/payments/webhook", express.raw({ type: "application/json" }), handleWebhook);
 app.use(express.json());
 app.use(clerkMiddleware());
 app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/inngest", serve({client: inngest, functions}));
 
@@ -44,10 +47,10 @@ app.get("/api/health", (req,res)=> {
 });
 
 if(ENV.NODE_ENV==="production"){
-    app.use(express.static(path.join(__dirname,"../admin/dist")))
+    app.use(express.static(path.join(__dirname,"../../admin/dist")))
 
-    app.get("/{*any}",(req,res)=>{
-        res.sendFile(path.join(__dirname,"../admin","dist","index.html"))
+    app.get(/.*/, (req,res)=>{
+        res.sendFile(path.join(__dirname,"../../admin/dist/index.html"))
     })
 }
 async function cleanLegacyOrderIndexes() {

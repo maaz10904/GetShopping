@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
 import { Review } from "../models/review.model.js";
@@ -39,6 +40,7 @@ export async function createOrder(req, res) {
          const order = await Order.create({
         user: user._id,
         clerkId: user.clerkId,
+        orderld: paymentResult?.id || crypto.randomUUID(),
         orderItems: validatedItems,
         shippingAddress,
         paymentResult,

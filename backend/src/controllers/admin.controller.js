@@ -1,7 +1,49 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import cloudinary from "../config/cloudinary.js";
+import { ENV } from "../config/env.js";
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const LOCAL_UPLOAD_DIR = path.resolve(__dirname, "../../uploads/products");
+
+const ensureLocalUploadDir = async () => {
+    await fs.promises.mkdir(LOCAL_UPLOAD_DIR, { recursive: true });
+};
+
+const saveBufferLocally = async (buffer, originalName) => {
+    await ensureLocalUploadDir();
+    const ext = path.extname(originalName).toLowerCase() || ".jpg";
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const filePath = path.join(LOCAL_UPLOAD_DIR, filename);
+    await fs.promises.writeFile(filePath, buffer);
+    return { secure_url: `${ENV.BACKEND_URL}/uploads/products/${filename}` };
+};
+
+const uploadBufferToCloudinary = async (file) => {
+    try {
+        return await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: "products", resource_type: "image" },
+                (error, result) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+            uploadStream.end(file.buffer);
+        });
+    } catch (error) {
+        console.warn("Cloudinary upload failed, saving locally instead:", error.message || error);
+        return await saveBufferLocally(file.buffer, file.originalname);
+    }
+};
 
 export async function createProduct(req, res) {
     try {
@@ -16,11 +58,7 @@ export async function createProduct(req, res) {
             return res.status(400).json({ message: "Maximum 3 images are allowed" });
         }
 
-        const uploadPromises = req.files.map((file) => {
-            return cloudinary.uploader.upload(file.path, {
-                folder: "products",
-            });
-        });
+        const uploadPromises = req.files.map((file) => uploadBufferToCloudinary(file));
         const uploadedImages = await Promise.all(uploadPromises);
 
         const imageUrls = uploadedImages.map((img) => img.secure_url);
@@ -70,11 +108,7 @@ export async function updateProduct(req, res) {
             if (req.files.length > 3) {
                 return res.status(400).json({ message: "Maximum 3 images are allowed" });
             }
-            const uploadPromises = req.files.map((file) => {
-                return cloudinary.uploader.upload(file.path, {
-                    folder: "products",
-                });
-            });
+            const uploadPromises = req.files.map((file) => uploadBufferToCloudinary(file));
             const uploadedImages = await Promise.all(uploadPromises);
             product.images = uploadedImages.map((img) => img.secure_url);
         }

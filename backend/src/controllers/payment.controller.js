@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import Stripe from "stripe";
 import { ENV } from "../config/env.js";
 import { User } from "../models/user.model.js";
@@ -26,6 +27,7 @@ async function createOrderFromPaymentIntent(paymentIntent) {
   const order = await Order.create({
     user: userId,
     clerkId,
+    orderld: paymentIntent.id || crypto.randomUUID(),
     orderItems: items,
     shippingAddress: JSON.parse(shippingAddress),
     paymentResult: {
